@@ -179,7 +179,7 @@ RDDetailedActionView.defaultSubtitleColor = .gray
 
 ### More
 
-For more details try Xcode [Demo project](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/Demo) and see [RDDetailedActionController.swift](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/RDDetailedActionController/RDDetailedActionController.swift)
+For more details try Xcode [DemoSwift project](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/DemoSwift) or [DemoObjC project](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/DemoObjC) and see [RDDetailedActionController.swift](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/RDDetailedActionController/RDDetailedActionController.swift)
 
 ## License
 
