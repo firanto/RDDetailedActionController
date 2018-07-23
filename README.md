@@ -9,13 +9,9 @@ Similar to Facebook's action menu.
 
 ## Preview
 
-### Default Action Sheet
+These are the example of action sheet with title only, title with icon, and title with icon and subtitle:
 
-
-### Action Sheet with Icon
-
-
-### Action Sheet with Icon and Subtitle
+<img src="https://github.com/kurotsukikaitou/RDDetailedActionController/raw/master/ReadmeImages/title-only.png" width="214"/> <img src="https://github.com/kurotsukikaitou/RDDetailedActionController/raw/master/ReadmeImages/icon-title.png" width="214"/> <img src="https://github.com/kurotsukikaitou/RDDetailedActionController/raw/master/ReadmeImages/icon-title-subtitle.png" width="214"/>
 
 ## Installation
 
