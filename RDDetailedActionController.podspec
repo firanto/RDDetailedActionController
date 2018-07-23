@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
     s.name = 'RDDetailedActionController'
-    s.version = '0.1.0'
+    s.version = '0.1.1'
     s.summary = 'Detailed cell item of action sheets. It has icon, title, and subtitle.'
     s.description = <<-DESC
                         Detailed cell item of action sheets. It has icon, title, and subtitle.
@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
     s.source = { :git => 'https://github.com/kurotsukikaitou/RDDetailedActionController.git', :tag => s.version }
 
     s.ios.deployment_target = '8.0'
+    s.swift_version = '4.0'
 
     s.source_files = 'RDDetailedActionController/*.swift'
 

@@ -66,7 +66,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let detailedActionController = RDDetailedActionController(title: "Select Action", subtitle: "for selected item", font: nil, titleColor: nil)
+        RDDetailedActionController.defaultTitleFont = UIFont(name: "HelveticaNeue", size: 14)!
+        RDDetailedActionController.defaultTitleColor = .blue
+        
+        RDDetailedActionView.defaultTitleColor = .darkGray
+        RDDetailedActionView.defaultSubtitleColor = .gray
+        
+        let detailedActionController = RDDetailedActionController(title: "Select Action", subtitle: "for selected item")
 
         switch indexPath.row {
         case 0:
@@ -79,7 +85,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             detailedActionController.addAction(title: "Item #3", subtitle: nil, icon: nil, action: { (actionView) in
                 print("Item #3 clicked")
             })
-            detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: nil, action: { (actionView) in
+            detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: nil, titleColor: .red, subtitleColor: nil, action: { (actionView) in
                 print("Item #4 clicked")
             })
             break
@@ -93,7 +99,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             detailedActionController.addAction(title: "Item #3", subtitle: nil, icon: UIImage(named: "Image-3"), action: { (actionView) in
                 print("Item #3 clicked")
             })
-            detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: UIImage(named: "Image-4"), action: { (actionView) in
+            detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: UIImage(named: "Image-4"), titleColor: .red, subtitleColor: nil, action: { (actionView) in
                 print("Item #4 clicked")
             })
             break
@@ -107,7 +113,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             detailedActionController.addAction(title: "Item #3", subtitle: "A detailed action with extra steps", icon: UIImage(named: "Image-3"), action: { (actionView) in
                 print("Item #3 clicked")
             })
-            detailedActionController.addAction(title: "Item #4", subtitle: "A super detailed action with complete extra steps", icon: UIImage(named: "Image-4"), action: { (actionView) in
+            detailedActionController.addAction(title: "Item #4", subtitle: "A destructor button to remove that item", icon: UIImage(named: "Image-4"), titleColor: .red, subtitleColor: UIColor.init(red: 1, green: 0.4, blue: 0.4, alpha: 1), action: { (actionView) in
                 print("Item #4 clicked")
             })
             break

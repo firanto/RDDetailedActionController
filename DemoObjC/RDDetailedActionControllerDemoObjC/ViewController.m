@@ -70,10 +70,14 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    RDDetailedActionController.defaultTitleFont = [UIFont fontWithName:@"HelveticaNeue" size:14];
+    RDDetailedActionController.defaultTitleColor = [UIColor blueColor];
+    
+    RDDetailedActionView.defaultTitleColor = [UIColor darkGrayColor];
+    RDDetailedActionView.defaultSubtitleColor = [UIColor grayColor];
+
     RDDetailedActionController *detailedActionController = [[RDDetailedActionController alloc] initWithTitle:@"Select Action"
-                                                                                                    subtitle:@"for selected item"
-                                                                                                        font:nil
-                                                                                                  titleColor:nil];
+                                                                                                    subtitle:@"for selected item"];
     
     switch (indexPath.row) {
         case 0:
@@ -86,7 +90,7 @@
             [detailedActionController addActionWithTitle:@"Item #3" subtitle:nil icon:nil action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #3 clicked");
             }];
-            [detailedActionController addActionWithTitle:@"Item #4" subtitle:nil icon:nil action:^(RDDetailedActionView *actionView) {
+            [detailedActionController addActionWithTitle:@"Item #4" subtitle:nil icon:nil titleColor:[UIColor redColor] subtitleColor:nil action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #4 clicked");
             }];
             break;
@@ -100,7 +104,7 @@
             [detailedActionController addActionWithTitle:@"Item #3" subtitle:nil icon:[UIImage imageNamed:@"Image-3"] action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #3 clicked");
             }];
-            [detailedActionController addActionWithTitle:@"Item #4" subtitle:nil icon:[UIImage imageNamed:@"Image-4"] action:^(RDDetailedActionView *actionView) {
+            [detailedActionController addActionWithTitle:@"Item #4" subtitle:nil icon:[UIImage imageNamed:@"Image-4"] titleColor:[UIColor redColor] subtitleColor:nil action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #4 clicked");
             }];
             break;
@@ -114,7 +118,7 @@
             [detailedActionController addActionWithTitle:@"Item #3" subtitle:@"A detailed action with extra steps" icon:[UIImage imageNamed:@"Image-3"] action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #3 clicked");
             }];
-            [detailedActionController addActionWithTitle:@"Item #4" subtitle:@"A super detailed action with complete extra steps" icon:[UIImage imageNamed:@"Image-4"] action:^(RDDetailedActionView *actionView) {
+            [detailedActionController addActionWithTitle:@"Item #4" subtitle:@"A super detailed action with complete extra steps" icon:[UIImage imageNamed:@"Image-4"] titleColor:[UIColor redColor] subtitleColor:[UIColor colorWithRed:1 green:0.4 blue:0.4 alpha:1] action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #4 clicked");
             }];
             break;

@@ -12,6 +12,10 @@ import UIKit
 //MARK: -
 public class RDDetailedActionController: UIViewController, RDDetailedActionDelegate {
     
+    //MARK: - Static Properties
+    @objc public static var defaultTitleFont: UIFont = UIFont.systemFont(ofSize: 14)
+    @objc public static var defaultTitleColor: UIColor = .black
+
     //MARK: - Properties
     fileprivate var actions: [RDDetailedActionView] = [RDDetailedActionView]()
     fileprivate var window: UIWindow = UIWindow()
@@ -35,6 +39,12 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     @objc public var titleColor: UIColor? = nil
     
     //MARK: - Initilizers
+    @objc public init(title: String?, subtitle: String?) {
+        super.init(nibName: nil, bundle: nil)
+        self.actionTitle = title
+        self.actionSubTitle = subtitle
+    }
+    
     @objc public init(title: String?, subtitle: String?, font: UIFont?, titleColor: UIColor?) {
         super.init(nibName: nil, bundle: nil)
         self.actionTitle = title
@@ -164,6 +174,10 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         addAction(action: RDDetailedActionView(title: title, subtitle: subtitle, icon: icon, action: action))
     }
     
+    @objc public func addAction(title: String, subtitle: String?, icon: UIImage?, titleColor: UIColor?, subtitleColor: UIColor?, action: ((RDDetailedActionView)->())?) {
+        addAction(action: RDDetailedActionView(title: title, subtitle: subtitle, icon: icon, titleColor: titleColor, subtitleColor: subtitleColor, action: action))
+    }
+    
     @objc public func show() {
         buildActionViews()
         
@@ -213,8 +227,8 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         titleLabel.textAlignment = .center
         titleLabel.backgroundColor = .clear
         titleLabel.text = actionTitle ?? "Select Action"
-        titleLabel.textColor = titleColor ?? .black
-        titleLabel.font = titleFont ?? UIFont(name: "HelveticaNeue", size: 14)
+        titleLabel.textColor = titleColor ?? RDDetailedActionController.defaultTitleColor
+        titleLabel.font = titleFont ?? RDDetailedActionController.defaultTitleFont
         titleLabel.lineBreakMode = .byTruncatingTail
         titleLabel.frame = CGRect(x: 42, y: 5, width: actionContainer.frame.width - 84, height: 17)
         titleLabel.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
@@ -233,8 +247,8 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
             subtitleLabel.textAlignment = .center
             subtitleLabel.backgroundColor = .clear
             subtitleLabel.text = actionSubTitle
-            subtitleLabel.textColor = titleColor ?? .black
-            subtitleLabel.font = titleFont ?? UIFont(name: "HelveticaNeue", size: 14)
+            subtitleLabel.textColor = titleColor ?? RDDetailedActionController.defaultTitleColor
+            subtitleLabel.font = titleFont ?? RDDetailedActionController.defaultTitleFont
             subtitleLabel.lineBreakMode = .byTruncatingTail
             subtitleLabel.frame = CGRect(x: 42, y: 22, width: actionContainer.frame.width - 84, height: 17)
             subtitleLabel.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
@@ -286,6 +300,15 @@ protocol RDDetailedActionDelegate {
 
 //MARK: -
 public class RDDetailedActionView: UIView {
+    
+    //MARK: - Static Properties
+    @objc static var defaultTitleFont: UIFont = UIFont.systemFont(ofSize: 14)
+    @objc static var defaultSubtitleFont: UIFont = UIFont.systemFont(ofSize: 12)
+    @objc static var defaultSingleTitleFont: UIFont = UIFont.systemFont(ofSize: 16)
+
+    @objc public static var defaultTitleColor: UIColor = .black
+    @objc public static var defaultSubtitleColor: UIColor = .darkGray
+
     //MARK: - Properties
     fileprivate var iconView: UIImageView = UIImageView()
     fileprivate var titleLabel: UILabel = UILabel()
@@ -298,7 +321,10 @@ public class RDDetailedActionView: UIView {
     @objc public var subtitle: String? = nil
     @objc public var icon: UIImage? = nil
     @objc public var action: ((RDDetailedActionView)->())? = nil
-    
+
+    @objc public var titleColor: UIColor? = nil
+    @objc public var subtitleColor: UIColor? = nil
+
     //MARK: - Initializers
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -315,6 +341,18 @@ public class RDDetailedActionView: UIView {
         self.title = title
         self.subtitle = subtitle
         self.icon = icon
+        self.action = action
+        
+        initializeSubViews()
+    }
+    
+    @objc public init (title: String, subtitle: String?, icon: UIImage?, titleColor: UIColor?, subtitleColor: UIColor?, action: ((RDDetailedActionView)->())?) {
+        super.init(frame: .zero)
+        self.title = title
+        self.subtitle = subtitle
+        self.icon = icon
+        self.titleColor = titleColor
+        self.subtitleColor = subtitleColor
         self.action = action
         
         initializeSubViews()
@@ -337,17 +375,17 @@ public class RDDetailedActionView: UIView {
         self.addSubview(subtitleLabel)
         subtitleLabel.frame = CGRect(x: 56, y: 30, width: self.frame.width - 68, height: 17)
         subtitleLabel.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
-        subtitleLabel.font = UIFont(name: "HelveticaNeue", size: 12)
+        subtitleLabel.font = RDDetailedActionView.defaultSubtitleFont
+        subtitleLabel.textColor = subtitleColor ?? RDDetailedActionView.defaultSubtitleColor
         subtitleLabel.lineBreakMode = .byTruncatingTail
-        subtitleLabel.textColor = .darkGray
         
         // title
         self.addSubview(titleLabel)
         titleLabel.frame = CGRect(x: 56, y: 13, width: self.frame.width - 68, height: 17)
         titleLabel.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
-        titleLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+        titleLabel.font = RDDetailedActionView.defaultTitleFont
+        titleLabel.textColor = titleColor ?? RDDetailedActionView.defaultTitleColor
         titleLabel.lineBreakMode = .byTruncatingTail
-        titleLabel.textColor = .black
         
         // separator
         self.addSubview(separator)
@@ -368,6 +406,9 @@ public class RDDetailedActionView: UIView {
         iconView.image = icon
         titleLabel.text = title
         subtitleLabel.text = subtitle
+        
+        titleLabel.textColor = titleColor ?? RDDetailedActionView.defaultTitleColor
+        subtitleLabel.textColor = subtitleColor ?? RDDetailedActionView.defaultSubtitleColor
         
         var leadingNotch: CGFloat = 0
         var trailingNotch: CGFloat = 0
@@ -410,7 +451,8 @@ public class RDDetailedActionView: UIView {
             frame.size.height = 18
             titleLabel.frame = frame
             
-            titleLabel.font = UIFont(name: "HelveticaNeue", size: 16)
+            titleLabel.font = RDDetailedActionView.defaultSingleTitleFont
+            titleLabel.textColor = titleColor ?? RDDetailedActionView.defaultTitleColor
             subtitleLabel.isHidden = true
         }
         else {
@@ -419,7 +461,8 @@ public class RDDetailedActionView: UIView {
             frame.size.height = 17
             titleLabel.frame = frame
             
-            titleLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+            titleLabel.font = RDDetailedActionView.defaultTitleFont
+            titleLabel.textColor = titleColor ?? RDDetailedActionView.defaultTitleColor
             subtitleLabel.isHidden = false
         }
     }
