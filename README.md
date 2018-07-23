@@ -3,9 +3,9 @@
 Detailed cell item of action sheets. It has icon, title, and subtitle. Similar to Facebook's action menu.
 Similar to Facebook's action menu.
 
-[![Platform](https://img.shields.io/cocoapods/p/LGAlertView.svg)](https://github.com/kurotsukikaitou/RDDetailedActionController)
-[![CocoaPods](https://img.shields.io/cocoapods/v/LGAlertView.svg)](http://cocoadocs.org/docsets/RDDetailedActionController)
-[![License](http://img.shields.io/cocoapods/l/LGAlertView.svg)](https://raw.githubusercontent.com/kurotsukikaitou/RDDetailedActionController/master/LICENSE)
+[![Platform](https://img.shields.io/cocoapods/p/RDDetailedActionController.svg)](https://github.com/kurotsukikaitou/RDDetailedActionController)
+[![CocoaPods](https://img.shields.io/cocoapods/v/RDDetailedActionController.svg)](http://cocoadocs.org/docsets/RDDetailedActionController)
+[![License](http://img.shields.io/cocoapods/l/RDDetailedActionController.svg)](https://raw.githubusercontent.com/kurotsukikaitou/RDDetailedActionController/master/LICENSE)
 
 ## Preview
 
@@ -21,7 +21,7 @@ Similar to Facebook's action menu.
 
 ### With source code
 
-[Download repository](https://github.com/kurotsukikaitou/RDDetailedActionController/archive/master.zip), then add [LGAlertView directory](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/LGAlertView/) to your project.
+[Download repository](https://github.com/kurotsukikaitou/RDDetailedActionController/archive/master.zip), then add [LGAlertView directory](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/RDDetailedActionController/) to your project.
 
 Then import header files where you need to use the library
 
@@ -142,8 +142,8 @@ detailedActionController.hide()
 
 ### More
 
-For more details try Xcode [Demo project](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/Demo) and see [LGAlertView.h](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/LGAlertView/LGAlertView.h)
+For more details try Xcode [Demo project](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/Demo) and see [RDDetailedActionController.swift](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/RDDetailedActionController/RDDetailedActionController.swift)
 
 ## License
 
-LGAlertView is released under the MIT license. See [LICENSE](https://raw.githubusercontent.com/kurotsukikaitou/RDDetailedActionController/master/LICENSE) for details.
+RDDetailedActionController is released under the MIT license. See [LICENSE](https://raw.githubusercontent.com/kurotsukikaitou/RDDetailedActionController/master/LICENSE) for details.
