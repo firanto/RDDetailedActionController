@@ -367,7 +367,7 @@ public class RDDetailedActionView: UIView {
         
         // icon
         self.addSubview(iconView)
-        iconView.frame = CGRect(x: 17, y: 18, width: 24, height: 24)
+        iconView.frame = CGRect(x: 21, y: 22, width: 16, height: 16)
         iconView.autoresizingMask = [.flexibleRightMargin, .flexibleBottomMargin]
         iconView.backgroundColor = .clear
         
@@ -440,7 +440,7 @@ public class RDDetailedActionView: UIView {
         }
         else {
             iconView.isHidden = false
-            iconView.frame = CGRect(x: 17 + leadingNotch, y: 18, width: 24, height: 24)
+            iconView.frame = CGRect(x: 21 + leadingNotch, y: 22, width: 16, height: 16)
             titleLabel.frame = CGRect(x: 56 + leadingNotch, y: 13, width: self.frame.width - 68 - (leadingNotch + trailingNotch), height: 17)
             subtitleLabel.frame = CGRect(x: 56 + leadingNotch, y: 30, width: self.frame.width - 68 - (leadingNotch + trailingNotch), height: 17)
         }
