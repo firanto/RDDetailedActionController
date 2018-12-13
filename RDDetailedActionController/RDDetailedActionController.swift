@@ -15,6 +15,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     //MARK: - Static Properties
     @objc public static var defaultTitleFont: UIFont = UIFont.systemFont(ofSize: 14)
     @objc public static var defaultTitleColor: UIColor = .black
+    @objc public static var defaultTitleSeparatorWidth: CGFloat = 0.5
 
     //MARK: - Properties
     fileprivate var actions: [RDDetailedActionView] = [RDDetailedActionView]()
@@ -27,22 +28,29 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     fileprivate var actionScrollView: UIScrollView = UIScrollView()
     fileprivate var actionContentView: UIView = UIView()
     
+    fileprivate var titleHeight: CGFloat = 43
     fileprivate var contentHeight: CGFloat = 0
     fileprivate var containerHeight: CGFloat = 10
     fileprivate var containerVisibleY: CGFloat = 0
     
     fileprivate var deltaY: CGFloat = 0
     
+    fileprivate var hasNotch: Bool = false
+
+    @objc public var titleView: UIView? = nil
+    
     @objc public var actionTitle: String? = nil
     @objc public var actionSubTitle: String? = nil
     @objc public var titleFont: UIFont? = nil
     @objc public var titleColor: UIColor? = nil
-    
+    @objc public var titleSeparatorHeight: CGFloat = defaultTitleSeparatorWidth
+
     //MARK: - Initilizers
     @objc public init(title: String?, subtitle: String?) {
         super.init(nibName: nil, bundle: nil)
         self.actionTitle = title
         self.actionSubTitle = subtitle
+        addSubViews()
     }
     
     @objc public init(title: String?, subtitle: String?, font: UIFont?, titleColor: UIColor?) {
@@ -51,14 +59,44 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         self.actionSubTitle = subtitle
         self.titleFont = font
         self.titleColor = titleColor
+        addSubViews()
+    }
+    
+    @objc public init(titleView: UIView) {
+        super.init(nibName: nil, bundle: nil)
+        self.titleView = titleView
+        addSubViews()
     }
     
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        addSubViews()
     }
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        addSubViews()
+    }
+    
+    fileprivate func addSubViews() {
+        self.view.addSubview(actionContainer)
+        self.view.addSubview(scrollingBar)
+        actionContainer.addSubview(titleLabel)
+        actionContainer.addSubview(subtitleLabel)
+        actionContainer.addSubview(titleSeparator)
+        actionContainer.addSubview(actionScrollView)
+        actionScrollView.addSubview(actionContentView)
+        
+        if titleView != nil {
+            actionContainer.addSubview(titleView!)
+            titleView!.frame = CGRect(x: 0, y: 0, width: actionContainer.bounds.width, height: titleView!.frame.height)
+            titleView!.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
+            titleHeight = titleView!.frame.height
+        }
+        else {
+            titleHeight = 43
+        }
+        
     }
     
     //MARK: - Lifecycles
@@ -66,6 +104,8 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
+        // States
+        self.hasNotch = isDeviceHasNotch(deviceName: getDeviceModel())
         
         // Window
         window.windowLevel = UIWindowLevelAlert + 1
@@ -78,13 +118,6 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         self.view.addGestureRecognizer(tapGesture)
         
         // Action container
-        self.view.addSubview(actionContainer)
-        actionContainer.addSubview(titleLabel)
-        actionContainer.addSubview(subtitleLabel)
-        actionContainer.addSubview(scrollingBar)
-        actionContainer.addSubview(titleSeparator)
-        actionContainer.addSubview(actionScrollView)
-        actionScrollView.addSubview(actionContentView)
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(RDDetailedActionController.panGestureDragged(sender:)))
         actionContainer.addGestureRecognizer(panGesture)
     }
@@ -134,16 +167,19 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
             deltaY = translationPoint.y
             
             var frame = actionContainer.frame
+            var barFrame = scrollingBar.frame
             frame.origin.y = containerVisibleY + deltaY
             if frame.origin.y < containerVisibleY {
                 frame.origin.y = containerVisibleY
             }
+            barFrame.origin.y = frame.origin.y - 12
             var alphaMultiplier = (containerHeight - deltaY) / containerHeight
             if alphaMultiplier > 1 {
                 alphaMultiplier = 1
             }
             self.view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5 * alphaMultiplier)
             actionContainer.frame = frame
+            self.scrollingBar.frame = barFrame
         }
         else if sender.state == .ended {
             if sender.velocity(in: self.view).y >= 1400 || deltaY > containerHeight * 0.6 {
@@ -152,10 +188,13 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
             }
             else {
                 // reset
-                let rect = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
+                let frame = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
+                var barFrame = scrollingBar.frame
+                barFrame.origin.y = frame.origin.y - 12
                 UIView.animate(withDuration: 0.3, animations: {
                     self.view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
-                    self.actionContainer.frame = rect
+                    self.actionContainer.frame = frame
+                    self.scrollingBar.frame = barFrame
                 })
             }
         }
@@ -167,6 +206,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     //MARK: - Actions
     @objc public func addAction(action: RDDetailedActionView) {
         action.delegate = self
+        action.hasNotch = self.hasNotch
         actions.append(action)
     }
     
@@ -186,20 +226,26 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
             window.rootViewController = self
             window.makeKeyAndVisible()
             
-            let rect = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
+            let contRect = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
+            var barRect = self.scrollingBar.frame
+            barRect.origin.y = contRect.origin.y - 12
             UIView.animate(withDuration: 0.3, animations: {
                 self.view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
-                self.actionContainer.frame = rect
+                self.actionContainer.frame = contRect
+                self.scrollingBar.frame = barRect
             })
         }
     }
     
     @objc public func hide() {
         if !window.isHidden {
-            let rect = CGRect(x: 0, y: self.view.frame.size.height, width: self.view.frame.size.width, height: containerHeight + 12)
+            let contRect = CGRect(x: 0, y: self.view.frame.size.height, width: self.view.frame.size.width, height: containerHeight + 12)
+            var barRect = self.scrollingBar.frame
+            barRect.origin.y = contRect.origin.y - 12
             UIView.animate(withDuration: 0.3, animations: {
                 self.view.backgroundColor = .clear
-                self.actionContainer.frame = rect
+                self.actionContainer.frame = contRect
+                self.scrollingBar.frame = barRect
             }, completion: { (finished) in
                 self.window.isHidden = true
             })
@@ -211,16 +257,23 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         
         // sizes
         contentHeight = CGFloat(60 * actions.count)
-        containerHeight = contentHeight + 64
+        containerHeight = contentHeight + titleHeight + 20
         if (containerHeight > self.view.frame.size.height - 80) {
             containerHeight = self.view.frame.size.height - 80
         }
         containerVisibleY = self.view.frame.size.height - containerHeight
         
+        // scrolling bar
+        scrollingBar.backgroundColor = UIColor(white: 0.9, alpha: 0.8)
+        scrollingBar.layer.cornerRadius = 3
+        scrollingBar.frame = CGRect(x: (self.view.frame.width - 100) / 2, y: self.view.frame.height - 12, width: 100, height: 6)
+        scrollingBar.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth, .flexibleBottomMargin]
+        
         // container
         actionContainer.backgroundColor = .white
+        actionContainer.clipsToBounds = true
         actionContainer.layer.cornerRadius = 12
-        actionContainer.frame = CGRect(x: 0, y: self.view.frame.size.height, width: self.view.frame.size.width, height: containerHeight + 12)
+        actionContainer.frame = CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: containerHeight + 12)
         actionContainer.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
         
         // title label
@@ -254,19 +307,13 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
             subtitleLabel.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
         }
         
-        // scrolling bar
-        scrollingBar.backgroundColor = UIColor(white: 0.9, alpha: 0.8)
-        scrollingBar.layer.cornerRadius = 3
-        scrollingBar.frame = CGRect(x: (actionContainer.frame.width - 100) / 2, y: -12, width: 100, height: 6)
-        scrollingBar.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth, .flexibleBottomMargin]
-        
         // title separator
         titleSeparator.backgroundColor = .lightGray
-        titleSeparator.frame = CGRect(x: 0, y: 43, width: actionContainer.frame.width, height: 0.5)
+        titleSeparator.frame = CGRect(x: 0, y: titleHeight, width: actionContainer.frame.width, height: titleSeparatorHeight)
         titleSeparator.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
         
         // scroll view
-        actionScrollView.frame = CGRect(x: 0, y: 44, width: actionContainer.frame.width, height: containerHeight - 50)
+        actionScrollView.frame = CGRect(x: 0, y: ceil(titleHeight + titleSeparatorHeight), width: actionContainer.frame.width, height: containerHeight - titleHeight - 7)
         actionScrollView.contentSize = CGSize(width: actionContainer.frame.width, height: contentHeight)
         actionScrollView.backgroundColor = .clear
         actionScrollView.scrollsToTop = false
@@ -290,6 +337,79 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
             action.applyValueChanges()
             posY += 60
         }
+    }
+    
+    //MARK: - Helpers
+    @objc func getDeviceModel() -> String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        
+        return mapToDevice(identifier: identifier)
+    }
+    
+    fileprivate func mapToDevice(identifier: String) -> String {
+        #if os(iOS)
+        switch identifier {
+        case "iPod5,1":                                 return "iPod Touch 5"
+        case "iPod7,1":                                 return "iPod Touch 6"
+        case "iPhone3,1", "iPhone3,2", "iPhone3,3":     return "iPhone 4"
+        case "iPhone4,1":                               return "iPhone 4s"
+        case "iPhone5,1", "iPhone5,2":                  return "iPhone 5"
+        case "iPhone5,3", "iPhone5,4":                  return "iPhone 5c"
+        case "iPhone6,1", "iPhone6,2":                  return "iPhone 5s"
+        case "iPhone7,2":                               return "iPhone 6"
+        case "iPhone7,1":                               return "iPhone 6 Plus"
+        case "iPhone8,1":                               return "iPhone 6s"
+        case "iPhone8,2":                               return "iPhone 6s Plus"
+        case "iPhone9,1", "iPhone9,3":                  return "iPhone 7"
+        case "iPhone9,2", "iPhone9,4":                  return "iPhone 7 Plus"
+        case "iPhone8,4":                               return "iPhone SE"
+        case "iPhone10,1", "iPhone10,4":                return "iPhone 8"
+        case "iPhone10,2", "iPhone10,5":                return "iPhone 8 Plus"
+        case "iPhone10,3", "iPhone10,6":                return "iPhone X"
+        case "iPhone11,2":                              return "iPhone XS"
+        case "iPhone11,4", "iPhone11,6":                return "iPhone XS Max"
+        case "iPhone11,8":                              return "iPhone XR"
+        case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":return "iPad 2"
+        case "iPad3,1", "iPad3,2", "iPad3,3":           return "iPad 3"
+        case "iPad3,4", "iPad3,5", "iPad3,6":           return "iPad 4"
+        case "iPad4,1", "iPad4,2", "iPad4,3":           return "iPad Air"
+        case "iPad5,3", "iPad5,4":                      return "iPad Air 2"
+        case "iPad6,11", "iPad6,12":                    return "iPad 5"
+        case "iPad7,5", "iPad7,6":                      return "iPad 6"
+        case "iPad2,5", "iPad2,6", "iPad2,7":           return "iPad Mini"
+        case "iPad4,4", "iPad4,5", "iPad4,6":           return "iPad Mini 2"
+        case "iPad4,7", "iPad4,8", "iPad4,9":           return "iPad Mini 3"
+        case "iPad5,1", "iPad5,2":                      return "iPad Mini 4"
+        case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7 Inch (2016)"
+        case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9 Inch (2016)"
+        case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 Inch (2017)"
+        case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5 Inch (2017)"
+        case "iPad8,1", "iPad8,2", "iPad8,3":           return "iPad Pro 11 Inch (2018)"
+        case "iPad8,5", "iPad8,7", "iPad8,8":           return "iPad Pro 12.9 Inch (2018)"
+        case "AppleTV5,3":                              return "Apple TV"
+        case "AppleTV6,2":                              return "Apple TV 4K"
+        case "AudioAccessory1,1":                       return "HomePod"
+        case "i386", "x86_64":                          return "Simulator \(mapToDevice(identifier: ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? "iOS"))"
+        default:                                        return identifier
+        }
+        #elseif os(tvOS)
+        switch identifier {
+        case "AppleTV5,3": return "Apple TV 4"
+        case "AppleTV6,2": return "Apple TV 4K"
+        case "i386", "x86_64": return "Simulator \(mapToDevice(identifier: ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? "tvOS"))"
+        default: return identifier
+        }
+        #endif
+    }
+    
+    fileprivate func isDeviceHasNotch(deviceName: String) -> Bool {
+        return deviceName.range(of: "iPhone X") != nil
     }
 }
 
@@ -317,6 +437,7 @@ public class RDDetailedActionView: UIView {
     
     var delegate: RDDetailedActionDelegate? = nil
     
+    var hasNotch: Bool = false
     @objc public var title: String = ""
     @objc public var subtitle: String? = nil
     @objc public var icon: UIImage? = nil
@@ -413,22 +534,12 @@ public class RDDetailedActionView: UIView {
         var leadingNotch: CGFloat = 0
         var trailingNotch: CGFloat = 0
         
-        let deviceModel = getDeviceModel()
-        var isHaveNotch: Bool = false
-        switch deviceModel {
-        case "iPhone X", "Simulator iPhone X":
-            isHaveNotch = true
-        default:
-            isHaveNotch = false
-            break
-        }
-        
         let uiOrientation = UIApplication.shared.statusBarOrientation
-        if isHaveNotch && uiOrientation == .landscapeLeft {
+        if hasNotch && uiOrientation == .landscapeLeft {
             leadingNotch = 0
             trailingNotch = 30
         }
-        else if isHaveNotch && uiOrientation == .landscapeRight {
+        else if hasNotch && uiOrientation == .landscapeRight {
             leadingNotch = 30
             trailingNotch = 0
         }
@@ -465,69 +576,5 @@ public class RDDetailedActionView: UIView {
             titleLabel.textColor = titleColor ?? RDDetailedActionView.defaultTitleColor
             subtitleLabel.isHidden = false
         }
-    }
-    
-    //MARK: - Helpers
-    @objc func getDeviceModel() -> String {
-        var systemInfo = utsname()
-        uname(&systemInfo)
-        let machineMirror = Mirror(reflecting: systemInfo.machine)
-        let identifier = machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8, value != 0 else { return identifier }
-            return identifier + String(UnicodeScalar(UInt8(value)))
-        }
-        
-        return mapToDevice(identifier: identifier)
-    }
-    
-    fileprivate func mapToDevice(identifier: String) -> String {
-        #if os(iOS)
-            switch identifier {
-            case "iPod5,1":                                 return "iPod Touch 5"
-            case "iPod7,1":                                 return "iPod Touch 6"
-            case "iPhone3,1", "iPhone3,2", "iPhone3,3":     return "iPhone 4"
-            case "iPhone4,1":                               return "iPhone 4s"
-            case "iPhone5,1", "iPhone5,2":                  return "iPhone 5"
-            case "iPhone5,3", "iPhone5,4":                  return "iPhone 5c"
-            case "iPhone6,1", "iPhone6,2":                  return "iPhone 5s"
-            case "iPhone7,2":                               return "iPhone 6"
-            case "iPhone7,1":                               return "iPhone 6 Plus"
-            case "iPhone8,1":                               return "iPhone 6s"
-            case "iPhone8,2":                               return "iPhone 6s Plus"
-            case "iPhone9,1", "iPhone9,3":                  return "iPhone 7"
-            case "iPhone9,2", "iPhone9,4":                  return "iPhone 7 Plus"
-            case "iPhone8,4":                               return "iPhone SE"
-            case "iPhone10,1", "iPhone10,4":                return "iPhone 8"
-            case "iPhone10,2", "iPhone10,5":                return "iPhone 8 Plus"
-            case "iPhone10,3", "iPhone10,6":                return "iPhone X"
-            case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":return "iPad 2"
-            case "iPad3,1", "iPad3,2", "iPad3,3":           return "iPad 3"
-            case "iPad3,4", "iPad3,5", "iPad3,6":           return "iPad 4"
-            case "iPad4,1", "iPad4,2", "iPad4,3":           return "iPad Air"
-            case "iPad5,3", "iPad5,4":                      return "iPad Air 2"
-            case "iPad6,11", "iPad6,12":                    return "iPad 5"
-            case "iPad7,5", "iPad7,6":                      return "iPad 6"
-            case "iPad2,5", "iPad2,6", "iPad2,7":           return "iPad Mini"
-            case "iPad4,4", "iPad4,5", "iPad4,6":           return "iPad Mini 2"
-            case "iPad4,7", "iPad4,8", "iPad4,9":           return "iPad Mini 3"
-            case "iPad5,1", "iPad5,2":                      return "iPad Mini 4"
-            case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7 Inch"
-            case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9 Inch"
-            case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 Inch 2. Generation"
-            case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5 Inch"
-            case "AppleTV5,3":                              return "Apple TV"
-            case "AppleTV6,2":                              return "Apple TV 4K"
-            case "AudioAccessory1,1":                       return "HomePod"
-            case "i386", "x86_64":                          return "Simulator \(mapToDevice(identifier: ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? "iOS"))"
-            default:                                        return identifier
-            }
-        #elseif os(tvOS)
-            switch identifier {
-            case "AppleTV5,3": return "Apple TV 4"
-            case "AppleTV6,2": return "Apple TV 4K"
-            case "i386", "x86_64": return "Simulator \(mapToDevice(identifier: ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? "tvOS"))"
-            default: return identifier
-            }
-        #endif
     }
 }

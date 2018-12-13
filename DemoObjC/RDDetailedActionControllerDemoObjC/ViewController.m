@@ -31,7 +31,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 3;
+    return 4;
 }
 
 - (NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
@@ -62,6 +62,10 @@
             cell.textLabel.text = @"Icon, Title, and Subtitle";
             cell.detailTextLabel.text = @"Show an actionsheet with icon, title, and subtitle";
             break;
+        case 3:
+            cell.textLabel.text = @"With custom title view";
+            cell.detailTextLabel.text = @"Show an actionsheet with custom title view";
+            break;
         default:
             break;
     }
@@ -72,15 +76,19 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     RDDetailedActionController.defaultTitleFont = [UIFont fontWithName:@"HelveticaNeue" size:14];
     RDDetailedActionController.defaultTitleColor = [UIColor blueColor];
+    RDDetailedActionController.defaultTitleSeparatorWidth = 3;
     
     RDDetailedActionView.defaultTitleColor = [UIColor darkGrayColor];
     RDDetailedActionView.defaultSubtitleColor = [UIColor grayColor];
 
-    RDDetailedActionController *detailedActionController = [[RDDetailedActionController alloc] initWithTitle:@"Select Action"
-                                                                                                    subtitle:@"for selected item"];
+    RDDetailedActionController *detailedActionController = nil;
+    UIView *titleView = nil;
     
     switch (indexPath.row) {
         case 0:
+            detailedActionController = [[RDDetailedActionController alloc] initWithTitle:@"Select Action"
+                                                                                subtitle:@"for selected item"];
+            
             [detailedActionController addActionWithTitle:@"Item #1" subtitle:nil icon:nil action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #1 clicked");
             }];
@@ -95,6 +103,9 @@
             }];
             break;
         case 1:
+            detailedActionController = [[RDDetailedActionController alloc] initWithTitle:@"Select Action"
+                                                                                subtitle:@"for selected item"];
+            
             [detailedActionController addActionWithTitle:@"Item #1" subtitle:nil icon:[UIImage imageNamed:@"Image-1"] action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #1 clicked");
             }];
@@ -109,6 +120,28 @@
             }];
             break;
         case 2:
+            detailedActionController = [[RDDetailedActionController alloc] initWithTitle:@"Select Action"
+                                                                                subtitle:@"for selected item"];
+            
+            [detailedActionController addActionWithTitle:@"Item #1" subtitle:@"A simple action for that item" icon:[UIImage imageNamed:@"Image-1"] action:^(RDDetailedActionView *actionView) {
+                NSLog(@"Item #1 clicked");
+            }];
+            [detailedActionController addActionWithTitle:@"Item #2" subtitle:@"A more detailed action for that item" icon:[UIImage imageNamed:@"Image-2"] action:^(RDDetailedActionView *actionView) {
+                NSLog(@"Item #2 clicked");
+            }];
+            [detailedActionController addActionWithTitle:@"Item #3" subtitle:@"A detailed action with extra steps" icon:[UIImage imageNamed:@"Image-3"] action:^(RDDetailedActionView *actionView) {
+                NSLog(@"Item #3 clicked");
+            }];
+            [detailedActionController addActionWithTitle:@"Item #4" subtitle:@"A super detailed action with complete extra steps" icon:[UIImage imageNamed:@"Image-4"] titleColor:[UIColor redColor] subtitleColor:[UIColor colorWithRed:1 green:0.4 blue:0.4 alpha:1] action:^(RDDetailedActionView *actionView) {
+                NSLog(@"Item #4 clicked");
+            }];
+            break;
+        case 3:
+            titleView = [[UIView alloc] initWithFrame:CGRectMake(12, 0, 320, 54)];
+            titleView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
+            
+            detailedActionController = [[RDDetailedActionController alloc] initWithTitleView:titleView];
+            
             [detailedActionController addActionWithTitle:@"Item #1" subtitle:@"A simple action for that item" icon:[UIImage imageNamed:@"Image-1"] action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #1 clicked");
             }];
