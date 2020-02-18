@@ -3,21 +3,21 @@
 Detailed cell item of action sheets. It has icon, title, and subtitle. Similar to Facebook's action menu.
 Similar to Facebook's action menu.
 
-[![Platform](https://img.shields.io/cocoapods/p/RDDetailedActionController.svg)](https://github.com/kurotsukikaitou/RDDetailedActionController)
+[![Platform](https://img.shields.io/cocoapods/p/RDDetailedActionController.svg)](https://github.com/firanto/RDDetailedActionController)
 [![CocoaPods](https://img.shields.io/cocoapods/v/RDDetailedActionController.svg)](http://cocoadocs.org/docsets/RDDetailedActionController)
-[![License](http://img.shields.io/cocoapods/l/RDDetailedActionController.svg)](https://raw.githubusercontent.com/kurotsukikaitou/RDDetailedActionController/master/LICENSE)
+[![License](http://img.shields.io/cocoapods/l/RDDetailedActionController.svg)](https://raw.githubusercontent.com/firanto/RDDetailedActionController/master/LICENSE)
 
 ## Preview
 
 These are the example of action sheet with title only, title with icon, and title with icon and subtitle:
 
-<img src="https://github.com/kurotsukikaitou/RDDetailedActionController/raw/master/ReadmeImages/title-only.png" width="214"/> <img src="https://github.com/kurotsukikaitou/RDDetailedActionController/raw/master/ReadmeImages/icon-title.png" width="214"/> <img src="https://github.com/kurotsukikaitou/RDDetailedActionController/raw/master/ReadmeImages/icon-title-subtitle.png" width="214"/>
+<img src="https://github.com/firanto/RDDetailedActionController/raw/master/ReadmeImages/title-only.png" width="214"/> <img src="https://github.com/firanto/RDDetailedActionController/raw/master/ReadmeImages/icon-title.png" width="214"/> <img src="https://github.com/firanto/RDDetailedActionController/raw/master/ReadmeImages/icon-title-subtitle.png" width="214"/>
 
 ## Installation
 
 ### With source code
 
-[Download repository](https://github.com/kurotsukikaitou/RDDetailedActionController/archive/master.zip), then add [RDDetailedActionController directory](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/RDDetailedActionController/) to your project.
+[Download repository](https://github.com/firanto/RDDetailedActionController/archive/master.zip), then add [RDDetailedActionController directory](https://github.com/firanto/RDDetailedActionController/blob/master/RDDetailedActionController/) to your project.
 
 Then import header files where you need to use the library
 
@@ -175,8 +175,8 @@ RDDetailedActionView.defaultSubtitleColor = .gray
 
 ### More
 
-For more details try Xcode [DemoSwift project](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/DemoSwift) or [DemoObjC project](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/DemoObjC) and see [RDDetailedActionController.swift](https://github.com/kurotsukikaitou/RDDetailedActionController/blob/master/RDDetailedActionController/RDDetailedActionController.swift)
+For more details try Xcode [DemoSwift project](https://github.com/firanto/RDDetailedActionController/blob/master/DemoSwift) or [DemoObjC project](https://github.com/firanto/RDDetailedActionController/blob/master/DemoObjC) and see [RDDetailedActionController.swift](https://github.com/firanto/RDDetailedActionController/blob/master/RDDetailedActionController/RDDetailedActionController.swift)
 
 ## License
 
-RDDetailedActionController is released under the MIT license. See [LICENSE](https://raw.githubusercontent.com/kurotsukikaitou/RDDetailedActionController/master/LICENSE) for details.
+RDDetailedActionController is released under the MIT license. See [LICENSE](https://raw.githubusercontent.com/firanto/RDDetailedActionController/master/LICENSE) for details.
