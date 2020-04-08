@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
     s.name = 'RDDetailedActionController'
-    s.version = '0.1.6'
+    s.version = '0.2.0'
     s.summary = 'Detailed cell item of action sheets. It has icon, title, and subtitle.'
     s.description = <<-DESC
                         Detailed cell item of action sheets. It has icon, title, and subtitle.
