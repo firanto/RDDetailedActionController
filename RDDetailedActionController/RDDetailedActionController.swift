@@ -148,9 +148,37 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         })
     }
     
+    var isChecked:Bool = false;
+    
     //MARK: - RDDetailedActionView Delegates
     func actionViewDidTapped(actionView: RDDetailedActionView) {
-        hide()
+        if !(actionView.children != nil) || actionView.children!.count <= 0 {
+            if !actionView.disabled {
+                hide()
+            }
+        }
+        else {
+            isChecked = !isChecked
+            UIView.animate(withDuration: 0.3, animations: {
+                var idx = self.actions.index(where: { (item) -> Bool in
+                    item.title == actionView.title // test if this is the item you're looking for
+                })
+                for act in actionView.children! {
+                    if self.isChecked {
+                        idx! += 1
+                        (act as! RDDetailedActionView).delegate = self
+                        (act as! RDDetailedActionView).hasNotch = self.hasNotch
+                        
+                        self.actions.insert(act as! RDDetailedActionView, at: idx!)
+                    }
+                    else {
+                        self.actions.remove(at: idx! + 1)
+                        (act as! RDDetailedActionView).removeFromSuperview()
+                    }
+                }
+                self.show()
+            })
+        }
     }
     
     //MARK: - UI Events
@@ -214,6 +242,14 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         addAction(action: RDDetailedActionView(title: title, subtitle: subtitle, icon: icon, action: action))
     }
     
+    @objc public func addAction(title: String, subtitle: String?, icon: UIImage?, disabled: Bool, action: ((RDDetailedActionView)->())?) {
+        addAction(action: RDDetailedActionView(title: title, subtitle: subtitle, icon: icon, disabled: disabled, action: action))
+    }
+    
+    @objc public func addAction(title: String, subtitle: String?, icon: UIImage?, children: NSMutableArray?, action: ((RDDetailedActionView)->())?) {
+        addAction(action: RDDetailedActionView(title: title, subtitle: subtitle, icon: icon, children: children, action: action))
+    }
+    
     @objc public func addAction(title: String, subtitle: String?, icon: UIImage?, titleColor: UIColor?, subtitleColor: UIColor?, action: ((RDDetailedActionView)->())?) {
         addAction(action: RDDetailedActionView(title: title, subtitle: subtitle, icon: icon, titleColor: titleColor, subtitleColor: subtitleColor, action: action))
     }
@@ -233,6 +269,18 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
                 self.view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
                 self.actionContainer.frame = contRect
                 self.scrollingBar.frame = barRect
+            })
+        }
+        else {
+            // window already shown
+            // do something to the UI, i.e. recalculate the rect, then animate the grow/shrink
+            let frame = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
+            var barFrame = scrollingBar.frame
+            barFrame.origin.y = frame.origin.y - 12
+            UIView.animate(withDuration: 0.3, animations: {
+                self.view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+                self.actionContainer.frame = frame
+                self.scrollingBar.frame = barFrame
             })
         }
     }
@@ -441,6 +489,8 @@ public class RDDetailedActionView: UIView {
     @objc public var title: String = ""
     @objc public var subtitle: String? = nil
     @objc public var icon: UIImage? = nil
+    @objc public var children: NSMutableArray? = nil
+    @objc public var disabled: Bool = false
     @objc public var action: ((RDDetailedActionView)->())? = nil
 
     @objc public var titleColor: UIColor? = nil
@@ -467,6 +517,28 @@ public class RDDetailedActionView: UIView {
         initializeSubViews()
     }
     
+    @objc public init (title: String, subtitle: String?, icon: UIImage?, disabled: Bool, action: ((RDDetailedActionView)->())?) {
+        super.init(frame: .zero)
+        self.title = title
+        self.subtitle = subtitle
+        self.icon = icon
+        self.action = action
+        self.disabled = disabled
+        
+        initializeSubViews()
+    }
+    
+    @objc public init (title: String, subtitle: String?, icon: UIImage?, children: NSMutableArray?, action: ((RDDetailedActionView)->())?) {
+        super.init(frame: .zero)
+        self.title = title
+        self.subtitle = subtitle
+        self.icon = icon
+        self.action = action
+        self.children = children
+        
+        initializeSubViews()
+    }
+    
     @objc public init (title: String, subtitle: String?, icon: UIImage?, titleColor: UIColor?, subtitleColor: UIColor?, action: ((RDDetailedActionView)->())?) {
         super.init(frame: .zero)
         self.title = title
@@ -475,6 +547,20 @@ public class RDDetailedActionView: UIView {
         self.titleColor = titleColor
         self.subtitleColor = subtitleColor
         self.action = action
+        
+        initializeSubViews()
+    }
+    
+    @objc public init (title: String, subtitle: String?, icon: UIImage?, titleColor: UIColor?, subtitleColor: UIColor?, children: NSMutableArray?, disabled: Bool, action: ((RDDetailedActionView)->())?) {
+        super.init(frame: .zero)
+        self.title = title
+        self.subtitle = subtitle
+        self.icon = icon
+        self.titleColor = titleColor
+        self.subtitleColor = subtitleColor
+        self.action = action
+        self.children = children
+        self.disabled = disabled
         
         initializeSubViews()
     }

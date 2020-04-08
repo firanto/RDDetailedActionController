@@ -81,7 +81,7 @@
     RDDetailedActionView.defaultTitleColor = [UIColor darkGrayColor];
     RDDetailedActionView.defaultSubtitleColor = [UIColor grayColor];
 
-    RDDetailedActionController *detailedActionController = nil;
+    __block RDDetailedActionController *detailedActionController = nil;
     UIView *titleView = nil;
     
     switch (indexPath.row) {
@@ -136,7 +136,7 @@
                 NSLog(@"Item #4 clicked");
             }];
             break;
-        case 3:
+        case 3:{
             titleView = [[UIView alloc] initWithFrame:CGRectMake(12, 0, 320, 54)];
             titleView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
             
@@ -148,13 +148,23 @@
             [detailedActionController addActionWithTitle:@"Item #2" subtitle:@"A more detailed action for that item" icon:[UIImage imageNamed:@"Image-2"] action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #2 clicked");
             }];
-            [detailedActionController addActionWithTitle:@"Item #3" subtitle:@"A detailed action with extra steps" icon:[UIImage imageNamed:@"Image-3"] action:^(RDDetailedActionView *actionView) {
+            
+            RDDetailedActionView *child1 = [[RDDetailedActionView alloc] initWithTitle:@"Sub Item #1" subtitle:@"Sub A detailed action with extra steps 1" icon:[UIImage imageNamed:@"Image-3"]  disabled:true action:^(RDDetailedActionView *actionView) {
+                NSLog(@"Item #3 clicked");
+            }];
+            
+            RDDetailedActionView *child2 = [[RDDetailedActionView alloc] initWithTitle:@"Sub Item #2" subtitle:@"Sub A detailed action with extra steps 2" icon:[UIImage imageNamed:@"Image-3"]  disabled:false action:^(RDDetailedActionView *actionView) {
+                NSLog(@"Item #3 clicked");
+            }];
+            NSMutableArray *acts = [NSMutableArray arrayWithObjects:child1, child2, nil];
+            [detailedActionController addActionWithTitle:@"Item #3" subtitle:@"A detailed action with extra steps" icon:[UIImage imageNamed:@"Image-3"] children:acts action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #3 clicked");
             }];
             [detailedActionController addActionWithTitle:@"Item #4" subtitle:@"A super detailed action with complete extra steps" icon:[UIImage imageNamed:@"Image-4"] titleColor:[UIColor redColor] subtitleColor:[UIColor colorWithRed:1 green:0.4 blue:0.4 alpha:1] action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #4 clicked");
             }];
             break;
+        }
         default:
             break;
     }
