@@ -38,7 +38,8 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     fileprivate var hasNotch: Bool = false
 
     @objc public var titleView: UIView? = nil
-    
+    @objc public var titleViewSidePadding: NSNumber? = nil
+
     @objc public var actionTitle: String? = nil
     @objc public var actionSubTitle: String? = nil
     @objc public var titleFont: UIFont? = nil
@@ -62,9 +63,10 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         addSubViews()
     }
     
-    @objc public init(titleView: UIView) {
+    @objc public init(titleView: UIView, sidePadding: NSNumber? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.titleView = titleView
+        self.titleViewSidePadding = sidePadding
         addSubViews()
     }
     
@@ -89,7 +91,6 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         
         if titleView != nil {
             actionContainer.addSubview(titleView!)
-            titleView!.frame = CGRect(x: 0, y: 0, width: actionContainer.bounds.width, height: titleView!.frame.height)
             titleView!.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
             titleHeight = titleView!.frame.height
         }
@@ -130,18 +131,53 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
+        // calculate content container
         contentHeight = CGFloat(60 * actions.count)
-        containerHeight = contentHeight + 64
+        containerHeight = contentHeight + titleHeight + 20
         if (containerHeight > size.height - 80) {
             containerHeight = size.height - 80
         }
         containerVisibleY = size.height - containerHeight
-        
+
+        // calculate bar indicator
+        var barRect = self.scrollingBar.frame
+        barRect.origin.x = (size.width - barRect.width) / 2
+        barRect.origin.y = containerVisibleY - 12
+
         coordinator.animate(alongsideTransition: { (context) in
             self.actionContainer.frame = CGRect(x: 0, y: self.containerVisibleY, width: size.width, height: self.containerHeight + 12)
             self.actionScrollView.contentSize = CGSize(width: size.width, height: self.contentHeight)
             self.actionContentView.frame = CGRect(x: 0, y: 0, width: size.width, height: self.contentHeight)
+            self.scrollingBar.frame = barRect
         }, completion: { (context) in
+            var leadingNotch: CGFloat = 0
+            var trailingNotch: CGFloat = 0
+            
+            let uiOrientation = UIApplication.shared.statusBarOrientation
+            if self.hasNotch && uiOrientation == .landscapeLeft {
+                leadingNotch = 0
+                trailingNotch = 30
+            }
+            else if self.hasNotch && uiOrientation == .landscapeRight {
+                leadingNotch = 30
+                trailingNotch = 0
+            }
+            
+            // adjust titleView content against notch
+            if self.titleView != nil {
+                if self.titleViewSidePadding != nil {
+                    for view in self.titleView!.subviews {
+                        view.frame = CGRect(
+                            x: CGFloat(self.titleViewSidePadding!.floatValue) + leadingNotch,
+                            y: view.frame.origin.y,
+                            width: self.titleView!.bounds.width - CGFloat(self.titleViewSidePadding!.floatValue * 2) - (leadingNotch + trailingNotch),
+                            height: view.frame.height
+                        )
+                    }
+                }
+            }
+            
+            // adjust actions against notch
             for action in self.actions {
                 action.applyValueChanges()
             }
@@ -262,6 +298,21 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
             window.rootViewController = self
             window.makeKeyAndVisible()
             
+            // adjust the width of the titleView only after makeKeyAndVisible to ensure titleView's child views frame integrity.
+            if titleView != nil {
+                titleView!.frame = CGRect(x: 0, y: 0, width: actionContainer.bounds.width, height: titleView!.frame.height)
+                if titleViewSidePadding != nil {
+                    for view in titleView!.subviews {
+                        view.frame = CGRect(
+                            x: CGFloat(titleViewSidePadding!.floatValue),
+                            y: view.frame.origin.y,
+                            width: titleView!.bounds.width - CGFloat(titleViewSidePadding!.floatValue * 2),
+                            height: view.frame.height
+                        )
+                    }
+                }
+            }
+            
             let contRect = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
             var barRect = self.scrollingBar.frame
             barRect.origin.y = contRect.origin.y - 12
@@ -314,8 +365,8 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         // scrolling bar
         scrollingBar.backgroundColor = UIColor(white: 0.9, alpha: 0.8)
         scrollingBar.layer.cornerRadius = 3
-        scrollingBar.frame = CGRect(x: (self.view.frame.width - 100) / 2, y: self.view.frame.height - 12, width: 100, height: 6)
-        scrollingBar.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth, .flexibleBottomMargin]
+        scrollingBar.frame = CGRect(x: (self.view.frame.width - 160) / 2, y: self.view.frame.height - 12, width: 160, height: 6)
+        scrollingBar.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleBottomMargin]
         
         // container
         actionContainer.backgroundColor = .white
@@ -423,24 +474,35 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         case "iPhone11,2":                              return "iPhone XS"
         case "iPhone11,4", "iPhone11,6":                return "iPhone XS Max"
         case "iPhone11,8":                              return "iPhone XR"
+        case "iPhone12,1":                              return "iPhone 11"
+        case "iPhone12,3":                              return "iPhone 11 Pro"
+        case "iPhone12,5":                              return "iPhone 11 Pro Max"
+        case "iPhone12,8":                              return "iPhone SE (2020)"
         case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":return "iPad 2"
         case "iPad3,1", "iPad3,2", "iPad3,3":           return "iPad 3"
         case "iPad3,4", "iPad3,5", "iPad3,6":           return "iPad 4"
-        case "iPad4,1", "iPad4,2", "iPad4,3":           return "iPad Air"
-        case "iPad5,3", "iPad5,4":                      return "iPad Air 2"
         case "iPad6,11", "iPad6,12":                    return "iPad 5"
         case "iPad7,5", "iPad7,6":                      return "iPad 6"
+        case "iPad7,11", "iPad7,12":                    return "iPad 7"
         case "iPad2,5", "iPad2,6", "iPad2,7":           return "iPad Mini"
         case "iPad4,4", "iPad4,5", "iPad4,6":           return "iPad Mini 2"
         case "iPad4,7", "iPad4,8", "iPad4,9":           return "iPad Mini 3"
         case "iPad5,1", "iPad5,2":                      return "iPad Mini 4"
+        case "iPad11,1", "iPad11,2":                    return "iPad Mini 5"
+        case "iPad4,1", "iPad4,2", "iPad4,3":           return "iPad Air"
+        case "iPad5,3", "iPad5,4":                      return "iPad Air 2"
+        case "iPad11,3", "iPad11,4":                    return "iPad Air (2019)"
         case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7 Inch (2016)"
         case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9 Inch (2016)"
         case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 Inch (2017)"
         case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5 Inch (2017)"
-        case "iPad8,1", "iPad8,2", "iPad8,3":           return "iPad Pro 11 Inch (2018)"
-        case "iPad8,5", "iPad8,7", "iPad8,8":           return "iPad Pro 12.9 Inch (2018)"
-        case "AppleTV5,3":                              return "Apple TV"
+        case "iPad8,1", "iPad8,2", "iPad8,3", "iPad8,4":return "iPad Pro 11 Inch (2018)"
+        case "iPad8,5", "iPad8,6", "iPad8,7", "iPad8,8":return "iPad Pro 12.9 Inch (2018)"
+        case "iPad8,9", "iPad8,10":                     return "iPad Pro 11 Inch (2020)"
+        case "iPad8,11", "iPad8,12":                    return "iPad Pro 12.9 Inch (2020)"
+        case "AppleTV2,1":                              return "Apple TV 2"
+        case "AppleTV3,1", "AppleTV3,2":                return "Apple TV 3"
+        case "AppleTV5,3":                              return "Apple TV HD"
         case "AppleTV6,2":                              return "Apple TV 4K"
         case "AudioAccessory1,1":                       return "HomePod"
         case "i386", "x86_64":                          return "Simulator \(mapToDevice(identifier: ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? "iOS"))"
@@ -448,7 +510,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         }
         #elseif os(tvOS)
         switch identifier {
-        case "AppleTV5,3": return "Apple TV 4"
+        case "AppleTV5,3": return "Apple TV HD"
         case "AppleTV6,2": return "Apple TV 4K"
         case "i386", "x86_64": return "Simulator \(mapToDevice(identifier: ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? "tvOS"))"
         default: return identifier
@@ -457,7 +519,8 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     }
     
     fileprivate func isDeviceHasNotch(deviceName: String) -> Bool {
-        return deviceName.range(of: "iPhone X") != nil
+        return deviceName.range(of: "iPhone X") != nil ||
+            deviceName.range(of: "iPhone 11") != nil
     }
 }
 
@@ -630,18 +693,7 @@ public class RDDetailedActionView: UIView {
             trailingNotch = 0
         }
         
-        if iconView.image == nil {
-            iconView.isHidden = true
-            titleLabel.frame = CGRect(x: 12 + leadingNotch, y: 13, width: self.frame.width - 24 - (leadingNotch + trailingNotch), height: 17)
-            subtitleLabel.frame = CGRect(x: 12 + leadingNotch, y: 30, width: self.frame.width - 24 - (leadingNotch + trailingNotch), height: 17)
-        }
-        else {
-            iconView.isHidden = false
-            iconView.frame = CGRect(x: 21 + leadingNotch, y: 22, width: 16, height: 16)
-            titleLabel.frame = CGRect(x: 56 + leadingNotch, y: 13, width: self.frame.width - 68 - (leadingNotch + trailingNotch), height: 17)
-            subtitleLabel.frame = CGRect(x: 56 + leadingNotch, y: 30, width: self.frame.width - 68 - (leadingNotch + trailingNotch), height: 17)
-        }
-        
+        // title and subtitle
         if subtitleLabel.text == nil {
             var frame = titleLabel.frame
             frame.origin.y = 21
@@ -662,5 +714,19 @@ public class RDDetailedActionView: UIView {
             titleLabel.textColor = titleColor ?? RDDetailedActionView.defaultTitleColor
             subtitleLabel.isHidden = false
         }
+        
+        // actions
+        if iconView.image == nil {
+            iconView.isHidden = true
+            titleLabel.frame = CGRect(x: 12 + leadingNotch, y: 13, width: self.frame.width - 24 - (leadingNotch + trailingNotch), height: 17)
+            subtitleLabel.frame = CGRect(x: 12 + leadingNotch, y: 30, width: self.frame.width - 24 - (leadingNotch + trailingNotch), height: 17)
+        }
+        else {
+            iconView.isHidden = false
+            iconView.frame = CGRect(x: 21 + leadingNotch, y: 22, width: 16, height: 16)
+            titleLabel.frame = CGRect(x: 56 + leadingNotch, y: 13, width: self.frame.width - 68 - (leadingNotch + trailingNotch), height: 17)
+            subtitleLabel.frame = CGRect(x: 56 + leadingNotch, y: 30, width: self.frame.width - 68 - (leadingNotch + trailingNotch), height: 17)
+        }
+        
     }
 }

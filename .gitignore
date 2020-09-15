@@ -19,8 +19,12 @@ DemoObjC/DerivedData/
 !default.perspectivev3
 DemoSwift/xcshareddata/
 DemoSwift/xcuserdata/
+DemoSwift/RDDetailedActionControllerDemoSwift.xcodeproj/xcshareddata
+DemoSwift/RDDetailedActionControllerDemoSwift.xcodeproj/xcuserdata
 DemoObjC/xcshareddata/
-DemoSwift/xcuserdata/
+DemoObjC/xcuserdata/
+DemoObjC/RDDetailedActionControllerDemoObjC.xcodeproj/xcshareddata
+DemoObjC/RDDetailedActionControllerDemoObjC.xcodeproj/xcuserdata
 
 ## Other
 *.moved-aside

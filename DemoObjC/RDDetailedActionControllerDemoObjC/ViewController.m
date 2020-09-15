@@ -140,7 +140,7 @@
             titleView = [[UIView alloc] initWithFrame:CGRectMake(12, 0, 320, 54)];
             titleView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
             
-            detailedActionController = [[RDDetailedActionController alloc] initWithTitleView:titleView];
+            detailedActionController = [[RDDetailedActionController alloc] initWithTitleView:titleView sidePadding:[NSNumber numberWithInt:12]];
             
             [detailedActionController addActionWithTitle:@"Item #1" subtitle:@"A simple action for that item" icon:[UIImage imageNamed:@"Image-1"] action:^(RDDetailedActionView *actionView) {
                 NSLog(@"Item #1 clicked");
