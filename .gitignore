@@ -17,8 +17,10 @@ DemoObjC/DerivedData/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
+DemoSwift/xcshareddata/
 DemoSwift/xcuserdata/
-DemoObjC/xcuserdata/
+DemoObjC/xcshareddata/
+DemoSwift/xcuserdata/
 
 ## Other
 *.moved-aside
