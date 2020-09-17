@@ -83,6 +83,7 @@
 
     __block RDDetailedActionController *detailedActionController = nil;
     UIView *titleView = nil;
+    UILabel *titleLabel = nil;
     
     switch (indexPath.row) {
         case 0:
@@ -137,8 +138,17 @@
             }];
             break;
         case 3:{
-            titleView = [[UIView alloc] initWithFrame:CGRectMake(12, 0, 320, 54)];
-            titleView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
+            titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 180)];
+            titleView.backgroundColor = [UIColor lightGrayColor];
+
+            titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 10, titleView.bounds.size.width - 24, 50)];
+            titleLabel.font = [UIFont boldSystemFontOfSize:20];
+            titleLabel.numberOfLines = 2;
+            titleLabel.textColor = [UIColor whiteColor];
+            titleLabel.backgroundColor = [UIColor grayColor];
+            titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
+            titleLabel.text = @"This is an action controller utilizing custom title view.";
+            [titleView addSubview:titleLabel];
             
             detailedActionController = [[RDDetailedActionController alloc] initWithTitleView:titleView sidePadding:[NSNumber numberWithInt:12]];
             

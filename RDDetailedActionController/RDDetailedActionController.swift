@@ -45,6 +45,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     @objc public var titleFont: UIFont? = nil
     @objc public var titleColor: UIColor? = nil
     @objc public var titleSeparatorHeight: CGFloat = defaultTitleSeparatorWidth
+    @objc public var isFloating: Bool = true
 
     //MARK: - Initilizers
     @objc public init(title: String?, subtitle: String?) {
@@ -137,7 +138,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         if (containerHeight > size.height - 80) {
             containerHeight = size.height - 80
         }
-        containerVisibleY = size.height - containerHeight
+        containerVisibleY = size.height - containerHeight - (isFloating ? (self.hasNotch ? 35 : 17) : 0)
 
         // calculate bar indicator
         var barRect = self.scrollingBar.frame
@@ -145,7 +146,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         barRect.origin.y = containerVisibleY - 12
 
         coordinator.animate(alongsideTransition: { (context) in
-            self.actionContainer.frame = CGRect(x: 0, y: self.containerVisibleY, width: size.width, height: self.containerHeight + 12)
+            self.actionContainer.frame = CGRect(x: self.isFloating ? 5 : 0, y: self.containerVisibleY, width: size.width - (self.isFloating ? 10 : 0), height: self.containerHeight + 12)
             self.actionScrollView.contentSize = CGSize(width: size.width, height: self.contentHeight)
             self.actionContentView.frame = CGRect(x: 0, y: 0, width: size.width, height: self.contentHeight)
             self.scrollingBar.frame = barRect
@@ -224,7 +225,6 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     
     @objc func panGestureDragged(sender: UIPanGestureRecognizer) {
         if sender.state == .began {
-            
         }
         else if sender.state == .changed {
             let translationPoint = sender.translation(in: self.view)
@@ -252,7 +252,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
             }
             else {
                 // reset
-                let frame = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
+                let frame = CGRect(x: isFloating ? 5 : 0, y: containerVisibleY, width: self.view.frame.size.width - (isFloating ? 10 : 0), height: containerHeight + 12)
                 var barFrame = scrollingBar.frame
                 barFrame.origin.y = frame.origin.y - 12
                 UIView.animate(withDuration: 0.3, animations: {
@@ -313,7 +313,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
                 }
             }
             
-            let contRect = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
+            let contRect = CGRect(x: isFloating ? 5 : 0, y: containerVisibleY, width: self.view.frame.size.width - (isFloating ? 10 : 0), height: containerHeight + 12)
             var barRect = self.scrollingBar.frame
             barRect.origin.y = contRect.origin.y - 12
             UIView.animate(withDuration: 0.3, animations: {
@@ -325,7 +325,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         else {
             // window already shown
             // do something to the UI, i.e. recalculate the rect, then animate the grow/shrink
-            let frame = CGRect(x: 0, y: containerVisibleY, width: self.view.frame.size.width, height: containerHeight + 12)
+            let frame = CGRect(x: isFloating ? 5 : 0, y: containerVisibleY, width: self.view.frame.size.width - (isFloating ? 10 : 0), height: containerHeight + 12)
             var barFrame = scrollingBar.frame
             barFrame.origin.y = frame.origin.y - 12
             UIView.animate(withDuration: 0.3, animations: {
@@ -338,7 +338,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
     
     @objc public func hide() {
         if !window.isHidden {
-            let contRect = CGRect(x: 0, y: self.view.frame.size.height, width: self.view.frame.size.width, height: containerHeight + 12)
+            let contRect = CGRect(x: 5, y: self.view.frame.size.height, width: self.view.frame.size.width - 10, height: containerHeight + 12)
             var barRect = self.scrollingBar.frame
             barRect.origin.y = contRect.origin.y - 12
             UIView.animate(withDuration: 0.3, animations: {
@@ -360,7 +360,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         if (containerHeight > self.view.frame.size.height - 80) {
             containerHeight = self.view.frame.size.height - 80
         }
-        containerVisibleY = self.view.frame.size.height - containerHeight
+        containerVisibleY = self.view.frame.size.height - containerHeight - (isFloating ? (self.hasNotch ? 35 : 17) : 0)
         
         // scrolling bar
         scrollingBar.backgroundColor = UIColor(white: 0.9, alpha: 0.8)
@@ -372,7 +372,7 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         actionContainer.backgroundColor = .white
         actionContainer.clipsToBounds = true
         actionContainer.layer.cornerRadius = 12
-        actionContainer.frame = CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: containerHeight + 12)
+        actionContainer.frame = CGRect(x: 5, y: self.view.frame.height, width: self.view.frame.width - 10, height: containerHeight + 12)
         actionContainer.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
         
         // title label
@@ -715,18 +715,32 @@ public class RDDetailedActionView: UIView {
             subtitleLabel.isHidden = false
         }
         
-        // actions
         if iconView.image == nil {
             iconView.isHidden = true
-            titleLabel.frame = CGRect(x: 12 + leadingNotch, y: 13, width: self.frame.width - 24 - (leadingNotch + trailingNotch), height: 17)
-            subtitleLabel.frame = CGRect(x: 12 + leadingNotch, y: 30, width: self.frame.width - 24 - (leadingNotch + trailingNotch), height: 17)
+            
+            var frame = titleLabel.frame
+            frame.origin.x = 12 + leadingNotch
+            frame.size.width = self.frame.width - 24 - (leadingNotch + trailingNotch)
+            titleLabel.frame = frame
+
+            frame = subtitleLabel.frame
+            frame.origin.x = 12 + leadingNotch
+            frame.size.width = self.frame.width - 24 - (leadingNotch + trailingNotch)
+            subtitleLabel.frame = frame
         }
         else {
             iconView.isHidden = false
             iconView.frame = CGRect(x: 21 + leadingNotch, y: 22, width: 16, height: 16)
-            titleLabel.frame = CGRect(x: 56 + leadingNotch, y: 13, width: self.frame.width - 68 - (leadingNotch + trailingNotch), height: 17)
-            subtitleLabel.frame = CGRect(x: 56 + leadingNotch, y: 30, width: self.frame.width - 68 - (leadingNotch + trailingNotch), height: 17)
+            
+            var frame = titleLabel.frame
+            frame.origin.x = 56 + leadingNotch
+            frame.size.width = self.frame.width - 68 - (leadingNotch + trailingNotch)
+            titleLabel.frame = frame
+
+            frame = subtitleLabel.frame
+            frame.origin.x = 56 + leadingNotch
+            frame.size.width = self.frame.width - 68 - (leadingNotch + trailingNotch)
+            subtitleLabel.frame = frame
         }
-        
     }
 }

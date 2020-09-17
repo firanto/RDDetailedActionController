@@ -76,59 +76,52 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         RDDetailedActionView.defaultTitleColor = .darkGray
         RDDetailedActionView.defaultSubtitleColor = .gray
 
-        if indexPath.row != 3 {
-            let detailedActionController = RDDetailedActionController(title: "Select Action", subtitle: "for selected item")
+        var detailedActionController = RDDetailedActionController(title: "Select Action", subtitle: "for selected item")
 
-            switch indexPath.row {
-            case 0:
-                detailedActionController.addAction(title: "Item #1", subtitle: nil, icon: nil, action: { (actionView) in
-                    print("Item #1 clicked")
-                })
-                detailedActionController.addAction(title: "Item #2", subtitle: nil, icon: nil, action: { (actionView) in
-                    print("Item #2 clicked")
-                })
-                detailedActionController.addAction(title: "Item #3", subtitle: nil, icon: nil, action: { (actionView) in
-                    print("Item #3 clicked")
-                })
-                detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: nil, titleColor: .red, subtitleColor: nil, action: { (actionView) in
-                    print("Item #4 clicked")
-                })
-                break
-            case 1:
-                detailedActionController.addAction(title: "Item #1", subtitle: nil, icon: UIImage(named: "Image-1"), action: { (actionView) in
-                    print("Item #1 clicked")
-                })
-                detailedActionController.addAction(title: "Item #2", subtitle: nil, icon: UIImage(named: "Image-2"), action: { (actionView) in
-                    print("Item #2 clicked")
-                })
-                detailedActionController.addAction(title: "Item #3", subtitle: nil, icon: UIImage(named: "Image-3"), action: { (actionView) in
-                    print("Item #3 clicked")
-                })
-                detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: UIImage(named: "Image-4"), titleColor: .red, subtitleColor: nil, action: { (actionView) in
-                    print("Item #4 clicked")
-                })
-                break
-            case 2:
-                detailedActionController.addAction(title: "Item #1", subtitle: "A simple action for that item", icon: UIImage(named: "Image-1"), action: { (actionView) in
-                    print("Item #1 clicked")
-                })
-                detailedActionController.addAction(title: "Item #2", subtitle: "A more detailed action for that item", icon: UIImage(named: "Image-2"), action: { (actionView) in
-                    print("Item #2 clicked")
-                })
-                detailedActionController.addAction(title: "Item #3", subtitle: "A detailed action with extra steps", icon: UIImage(named: "Image-3"), action: { (actionView) in
-                    print("Item #3 clicked")
-                })
-                detailedActionController.addAction(title: "Item #4", subtitle: "A destructor button to remove that item", icon: UIImage(named: "Image-4"), titleColor: .red, subtitleColor: UIColor.init(red: 1, green: 0.4, blue: 0.4, alpha: 1), action: { (actionView) in
-                    print("Item #4 clicked")
-                })
-                break
-            default:
-                break
-            }
-
-            detailedActionController.show()
-        }
-        else {
+        switch indexPath.row {
+        case 0:
+            detailedActionController.addAction(title: "Item #1", subtitle: nil, icon: nil, action: { (actionView) in
+                print("Item #1 clicked")
+            })
+            detailedActionController.addAction(title: "Item #2", subtitle: nil, icon: nil, action: { (actionView) in
+                print("Item #2 clicked")
+            })
+            detailedActionController.addAction(title: "Item #3", subtitle: nil, icon: nil, action: { (actionView) in
+                print("Item #3 clicked")
+            })
+            detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: nil, titleColor: .red, subtitleColor: nil, action: { (actionView) in
+                print("Item #4 clicked")
+            })
+            break
+        case 1:
+            detailedActionController.addAction(title: "Item #1", subtitle: nil, icon: UIImage(named: "Image-1"), action: { (actionView) in
+                print("Item #1 clicked")
+            })
+            detailedActionController.addAction(title: "Item #2", subtitle: nil, icon: UIImage(named: "Image-2"), action: { (actionView) in
+                print("Item #2 clicked")
+            })
+            detailedActionController.addAction(title: "Item #3", subtitle: nil, icon: UIImage(named: "Image-3"), action: { (actionView) in
+                print("Item #3 clicked")
+            })
+            detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: UIImage(named: "Image-4"), titleColor: .red, subtitleColor: nil, action: { (actionView) in
+                print("Item #4 clicked")
+            })
+            break
+        case 2:
+            detailedActionController.addAction(title: "Item #1", subtitle: "A simple action for that item", icon: UIImage(named: "Image-1"), action: { (actionView) in
+                print("Item #1 clicked")
+            })
+            detailedActionController.addAction(title: "Item #2", subtitle: "A more detailed action for that item", icon: UIImage(named: "Image-2"), action: { (actionView) in
+                print("Item #2 clicked")
+            })
+            detailedActionController.addAction(title: "Item #3", subtitle: "A detailed action with extra steps", icon: UIImage(named: "Image-3"), action: { (actionView) in
+                print("Item #3 clicked")
+            })
+            detailedActionController.addAction(title: "Item #4", subtitle: "A destructor button to remove that item", icon: UIImage(named: "Image-4"), titleColor: .red, subtitleColor: UIColor.init(red: 1, green: 0.4, blue: 0.4, alpha: 1), action: { (actionView) in
+                print("Item #4 clicked")
+            })
+            break
+        case 3:
             let titleView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 180))
             titleView.backgroundColor = .lightGray
             
@@ -141,7 +134,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             titleLabel.text = "This is an action controller utilizing custom title view."
             titleView.addSubview(titleLabel)
             
-            let detailedActionController = RDDetailedActionController(titleView: titleView, sidePadding: 12)
+            detailedActionController = RDDetailedActionController(titleView: titleView, sidePadding: 12)
             
             detailedActionController.addAction(title: "Item #1", subtitle: nil, icon: nil, action: { (actionView) in
                 print("Item #1 clicked")
@@ -155,9 +148,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             detailedActionController.addAction(title: "Item #4", subtitle: nil, icon: nil, titleColor: .red, subtitleColor: nil, action: { (actionView) in
                 print("Item #4 clicked")
             })
-            
-            detailedActionController.show()
+            break
+        default:
+            break
         }
+
+        detailedActionController.show()
     }
 }
 
