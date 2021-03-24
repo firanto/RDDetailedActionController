@@ -1,0 +1,4 @@
+#!/bin/bash
+
+pod repo push RDDetailedActionController RDDetailedActionController.podspec
+pod trunk push RDDetailedActionController.podspec

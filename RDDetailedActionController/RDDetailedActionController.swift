@@ -438,7 +438,6 @@ public class RDDetailedActionController: UIViewController, RDDetailedActionDeleg
         }
     }
     
-    //MARK: - Helpers
     @objc func getDeviceModel() -> String {
         var systemInfo = utsname()
         uname(&systemInfo)
